@@ -363,6 +363,25 @@ export function initJwtView() {
     fireEvent($algRadio.get(0));
   }
 
+  // Check each line for numbers that look like a date and
+  // if it appears to be a date within a year of today,
+  // add a tooltip with the date.
+  function addTimeTooltip(instance, line, element){
+    var now = Date.now();
+    var oneYear = 356 * 24 * 60 * 60 * 1000;
+    var maxTime = now + oneYear;
+    var minTime = now - oneYear;
+    var children = element.getElementsByClassName("cm-number");
+
+    for (var i = 0; i < children.length; i++) {
+      var valueAsTime = children[i].innerText * 1000;
+      if (valueAsTime > minTime && valueAsTime < maxTime) {
+        // Number appears to be a time within 1 year of today's date. Add title to element.
+        children[i].title = new Date(valueAsTime);
+      }
+    }
+  }
+
   function refreshTokenEditor(instance) {
     tokenEditor.off('change', tokenEditorOnChangeListener);
 
@@ -425,6 +444,7 @@ export function initJwtView() {
 
   tokenEditor.on('change', tokenEditorOnChangeListener);
 
+  payloadEditor.on("renderLine", addTimeTooltip)
   payloadEditor.on('change',  refreshTokenEditor);
   headerEditor.on('change',   refreshTokenEditor);
 
